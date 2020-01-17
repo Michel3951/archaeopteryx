@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Domain;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 
@@ -9,7 +10,11 @@ class HomeController extends Controller
 {
     public function index()
     {
-        return view('home');
+        $domains = Domain::all();
+
+        return view('domain.index', [
+            'domains' => $domains
+        ]);
     }
 
     public function create()
@@ -22,18 +27,33 @@ class HomeController extends Controller
 
     public function handle(Request $request)
     {
-//        dd($request->all());
         $request->validate([
             'domain' => 'required',
             'type' => 'numeric',
             'preset' => 'nullable|string'
 
         ]);
-        $job = Artisan::call('windows:domain', [
+        $options = [
             'name' => $request->input('domain'),
-            '--preset=' => $request->input('preset'),
-            '--type=' => $request->input('type')
+            '--type' => $request->input('type')
+        ];
+
+        if ($request->input('preset')) {
+            $options['--preset'] = $request->input('preset');
+        }
+
+        if (!$request->input('nohost')) {
+            $options['--no-host'] = true;
+        }
+
+        Artisan::call('windows:domain', $options);
+
+        Domain::create([
+            'root' => config('app.apache_root') . '/' . $request->input('domain'),
+            'domain' => $request->input('domain'),
+            'type' => $request->input('type')
         ]);
+
         return redirect()->route('create');
     }
 }

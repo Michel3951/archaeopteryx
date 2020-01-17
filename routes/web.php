@@ -11,9 +11,15 @@
 |
 */
 
-Route::get('/', 'HomeController@index')->name('home');
-Route::get('/new', 'HomeController@create')->name('create');
-Route::post('/new', 'HomeController@handle')->name('handle');
+Route::group([
+    'prefix' => '/domains'
+], function () {
+    Route::get('/', 'HomeController@index')->name('home');
+    Route::get('/new', 'HomeController@create')->name('create');
+    Route::post('/new', 'HomeController@handle')->name('handle');
+    Route::get('/{domain}/files', 'Files\FileManagerController@index')->name('domain.files.index');
+    Route::get('/{domain}/files/open', 'Files\FileManagerController@edit')->name('domain.files.edit');
+});
 
 Route::group([
     'namespace' => 'Auth'

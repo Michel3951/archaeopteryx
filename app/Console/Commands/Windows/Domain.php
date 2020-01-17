@@ -7,7 +7,7 @@ use Symfony\Component\Process\Process;
 
 class Domain extends Command
 {
-    protected $signature = 'windows:domain {name : The domain name} {--preset= : Preset to use, optional} {--type= : The type of the project} {--host= : Create virtual host}';
+    protected $signature = 'windows:domain {name : The domain name} {--preset= : Preset to use, optional} {--type= : The type of the project} {--no-host : Dont create a virtual host}';
 
     protected $description = 'Command description';
 
@@ -55,20 +55,23 @@ class Domain extends Command
         }
 
         if (array_key_exists('preset', $options)) {
-            print str_replace("\\", "/", $options['preset']) . PHP_EOL;
-            print $path . PHP_EOL;
             $copy = Process::fromShellCommandline("xcopy \"" . str_replace("\\", "/", $options['preset']) . "\" \"$path\" /s /e /h");
             $copy->run();
             $copy->getOutput();
         }
 
-        if (array_key_exists('host', $options)) {
-            $host = $options['host'];
-            $append = new Process(['echo', "127.0.0.1 {$host}", '>>', 'C:\Windows\System32\drivers\etc\hosts']);
+        if (!array_key_exists('no-host', $options)) {
+            $append = new Process(['echo', "127.0.0.1 {$domain}", '>>', 'C:\Windows\System32\drivers\etc\hosts']);
             $append->run();
             if (!$append->isSuccessful()) {
-                dd($append->getErrorOutput());
+                print $append->getErrorOutput();
             }
         }
+
+        return [
+            'root' => $path,
+            'type' => (int) $type,
+            'domain' => $domain
+        ];
     }
 }

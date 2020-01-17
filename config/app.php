@@ -2,6 +2,8 @@
 
 return [
 
+    'apache_root' => env('APACHE_ROOT', null),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name
