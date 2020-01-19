@@ -48,7 +48,31 @@
             @yield('content')
         </main>
     </div>
+
+    @if (session()->has('toast'))
+        <div class="position-absolute d-flex flex-column p-4" style="width: 350px">
+            <div class="position-fixed" style="bottom: 2rem; right: 2rem">
+                @foreach (session()->get('toast') as $toast)
+                    <div class="toast" style="min-width: 300px; max-width: 350px;" role="alert" aria-live="assertive" aria-atomic="true" data-delay="10000">
+                        <div class="toast-header">
+                            <strong class="mr-auto">{{ $toast['title'] ?? 'Archaeopteryx' }}</strong>
+                        </div>
+                        <div class="toast-body" style="color: #000000">
+                            {!! $toast['content'] !!}
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
 </div>
 <script src="{{ asset('js/jquery.js') }}"></script>
+<script src="{{ asset('libs/popper.min.js') }}"></script>
+<script src="{{ asset('libs/bootstrap/js/bootstrap.min.js') }}"></script>
+<script>
+    $(document).ready(function () {
+       $('.toast').toast('show');
+    });
+</script>
 </body>
 </html>

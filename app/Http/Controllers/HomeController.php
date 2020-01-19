@@ -54,6 +54,6 @@ class HomeController extends Controller
             'type' => $request->input('type')
         ]);
 
-        return redirect()->route('create');
+        return redirect()->route('home');
     }
 }

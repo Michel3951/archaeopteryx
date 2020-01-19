@@ -8,14 +8,15 @@
                 <h1>{{ domain.domain }}</h1>
             </div>
             <div class="card-body">
+                <p>
+                    <span class="mr-3">Website at <a :href="`/domains/${domain.domain}/files?path=/`">{{ domain.root.replace(/[a-z-A-Z]:\/|xampp\//g, '')}}</a></span>
+                </p>
                 <div class="row">
-                    <div class="col-md-6">
-                        <ul class="list-unstyled">
-                            <li><a :href="'/domains/' + domain.domain + '/files?path=/'"><i class="fas fa-folder-open"></i> File Manager</a></li>
-                        </ul>
-                    </div>
-                    <div class="col-md-6">
-
+                    <div class="col-md-4">
+                        <a :href="'/domains/' + domain.domain + '/files?path=/'">
+                            <i class="fas fa-folder-open" style="font-size: 1.5rem"></i>
+                            File Manager
+                        </a>
                     </div>
                 </div>
             </div>
@@ -33,7 +34,6 @@
         methods: {},
         mounted() {
             this.csrf = window.Laravel.csrfToken;
-
         }
     }
 </script>

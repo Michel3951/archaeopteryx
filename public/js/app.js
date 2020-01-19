@@ -2048,6 +2048,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'Index',
   props: ['domains'],
@@ -2082,12 +2083,37 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'Edit',
   props: ['domain', 'file', 'path'],
   data: function data() {
     return {
-      csrf: null
+      csrf: null,
+      filename: ''
     };
   },
   methods: {
@@ -2096,12 +2122,53 @@ __webpack_require__.r(__webpack_exports__);
       if (path.startsWith('/')) path = path.slice(1);
       if (path.length > 0) path += '/';
       return path + this.file.name;
+    },
+    reset: function reset() {
+      this.editor.setValue(this.file.content);
+    },
+    save: function save() {
+      fetch("/domains/".concat(this.domain.domain, "/files/save?path=").concat(this.path, "&file=").concat(this.file.name), {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          'X-CSRF-TOKEN': this.csrf
+        },
+        body: JSON.stringify({
+          _token: this.csrf,
+          content: this.editor.getValue(),
+          file: this.file.name
+        })
+      }).then(function (res) {
+        return res.json();
+      }).then(function (json) {
+        window.location = json.url;
+      });
+    },
+    saveAs: function saveAs() {
+      fetch("/domains/".concat(this.domain.domain, "/files/save?path=").concat(this.path, "&file=").concat(this.file.name), {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          'X-CSRF-TOKEN': this.csrf
+        },
+        body: JSON.stringify({
+          _token: this.csrf,
+          content: this.editor.getValue(),
+          file: this.filename
+        })
+      }).then(function (res) {
+        return res.json();
+      }).then(function (json) {
+        window.location = json.url;
+      });
     }
   },
   mounted: function mounted() {
     this.csrf = window.Laravel.csrfToken;
-    var editor = ace.edit('editor');
-    editor.getSession().setMode("ace/mode/php");
+    this.editor = ace.edit('editor');
+    this.filename = this.file.name;
+    var type = this.file.name.split('.').reverse()[0];
+    this.editor.getSession().setMode("ace/mode/" + type);
   }
 });
 
@@ -2149,15 +2216,81 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'Index',
   props: ['domain', 'files', 'path'],
   data: function data() {
     return {
-      csrf: null
+      csrf: null,
+      file: {
+        name: ''
+      },
+      directory: {
+        name: ''
+      }
     };
   },
   methods: {
+    createFile: function createFile() {
+      fetch("/domains/".concat(this.domain.domain, "/files/create?path=").concat(this.path, "&file=").concat(this.file.name), {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          'X-CSRF-TOKEN': this.csrf
+        },
+        body: JSON.stringify({
+          _token: this.csrf,
+          file: this.file.name,
+          type: 'file'
+        })
+      }).then(function (res) {
+        return res.json();
+      }).then(function (json) {
+        window.location = json.url;
+      });
+    },
+    createDirectory: function createDirectory() {},
     formatPath: function formatPath(child) {
       var current = this.path;
 
@@ -37697,27 +37830,45 @@ var render = function() {
             ]),
             _vm._v(" "),
             _c("div", { staticClass: "card-body" }, [
-              _c("div", { staticClass: "row" }, [
-                _c("div", { staticClass: "col-md-6" }, [
-                  _c("ul", { staticClass: "list-unstyled" }, [
-                    _c("li", [
-                      _c(
-                        "a",
-                        {
-                          attrs: {
-                            href: "/domains/" + domain.domain + "/files?path=/"
-                          }
-                        },
-                        [
-                          _c("i", { staticClass: "fas fa-folder-open" }),
-                          _vm._v(" File Manager")
-                        ]
+              _c("p", [
+                _c("span", { staticClass: "mr-3" }, [
+                  _vm._v("Website at "),
+                  _c(
+                    "a",
+                    {
+                      attrs: {
+                        href: "/domains/" + domain.domain + "/files?path=/"
+                      }
+                    },
+                    [
+                      _vm._v(
+                        _vm._s(domain.root.replace(/[a-z-A-Z]:\/|xampp\//g, ""))
                       )
-                    ])
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "col-md-6" })
+                    ]
+                  )
+                ])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "row" }, [
+                _c("div", { staticClass: "col-md-4" }, [
+                  _c(
+                    "a",
+                    {
+                      attrs: {
+                        href: "/domains/" + domain.domain + "/files?path=/"
+                      }
+                    },
+                    [
+                      _c("i", {
+                        staticClass: "fas fa-folder-open",
+                        staticStyle: { "font-size": "1.5rem" }
+                      }),
+                      _vm._v(
+                        "\n                        File Manager\n                    "
+                      )
+                    ]
+                  )
+                ])
               ])
             ])
           ]
@@ -37785,10 +37936,161 @@ var render = function() {
         attrs: { id: "editor" }
       },
       [_vm._v(_vm._s(_vm.file.content))]
+    ),
+    _vm._v(" "),
+    _c(
+      "button",
+      {
+        staticClass: "btn btn-primary",
+        attrs: { type: "button" },
+        on: {
+          click: function($event) {
+            return _vm.reset()
+          }
+        }
+      },
+      [_vm._v("Reset")]
+    ),
+    _vm._v(" "),
+    _c(
+      "button",
+      {
+        staticClass: "btn btn-primary",
+        attrs: { type: "button" },
+        on: {
+          click: function($event) {
+            return _vm.save()
+          }
+        }
+      },
+      [_vm._v("Save")]
+    ),
+    _vm._v(" "),
+    _c(
+      "button",
+      {
+        staticClass: "btn btn-primary",
+        attrs: {
+          type: "button",
+          "data-toggle": "modal",
+          "data-target": "#save-as-modal"
+        }
+      },
+      [_vm._v("Save As")]
+    ),
+    _vm._v(" "),
+    _c(
+      "button",
+      {
+        staticClass: "btn btn-primary",
+        attrs: { type: "button", onclick: "history.back()" }
+      },
+      [_vm._v("Cancel")]
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal fade",
+        attrs: {
+          id: "save-as-modal",
+          tabindex: "-1",
+          role: "dialog",
+          "aria-labelledby": "save-as-modal-label",
+          "aria-hidden": "true"
+        }
+      },
+      [
+        _c(
+          "div",
+          { staticClass: "modal-dialog", attrs: { role: "document" } },
+          [
+            _c("div", { staticClass: "modal-content" }, [
+              _vm._m(0),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-body" }, [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.filename,
+                      expression: "filename"
+                    }
+                  ],
+                  staticClass: "form-control",
+                  class: { "is-invalid": !_vm.filename },
+                  attrs: { type: "text", name: "filename", id: "filename" },
+                  domProps: { value: _vm.filename },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.filename = $event.target.value
+                    }
+                  }
+                })
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-footer" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-secondary",
+                    attrs: { type: "button", "data-dismiss": "modal" }
+                  },
+                  [_vm._v("Close")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-primary",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        return _vm.saveAs()
+                      }
+                    }
+                  },
+                  [_vm._v("Save")]
+                )
+              ])
+            ])
+          ]
+        )
+      ]
     )
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "h5",
+        { staticClass: "modal-title", attrs: { id: "save-as-modal-label" } },
+        [_vm._v("Save file as")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
+    ])
+  }
+]
 render._withStripped = true
 
 
@@ -37814,6 +38116,24 @@ var render = function() {
     _c("h1", { staticClass: "mb-3" }, [
       _vm._v("File manager for " + _vm._s(_vm.domain.domain))
     ]),
+    _vm._v(" "),
+    _c(
+      "button",
+      {
+        staticClass: "btn btn-primary",
+        attrs: { "data-toggle": "modal", "data-target": "#create-file" }
+      },
+      [_vm._v("Create file")]
+    ),
+    _vm._v(" "),
+    _c(
+      "button",
+      {
+        staticClass: "btn btn-primary",
+        attrs: { "data-toggle": "modal", "data-target": "#create-directory" }
+      },
+      [_vm._v("Create directory")]
+    ),
     _vm._v(" "),
     _c("table", { staticClass: "file-table mt-3" }, [
       _vm._m(0),
@@ -37867,7 +38187,161 @@ var render = function() {
         ],
         2
       )
-    ])
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal fade",
+        attrs: {
+          id: "create-file",
+          tabindex: "-1",
+          role: "dialog",
+          "aria-labelledby": "create-file-label",
+          "aria-hidden": "true"
+        }
+      },
+      [
+        _c(
+          "div",
+          { staticClass: "modal-dialog", attrs: { role: "document" } },
+          [
+            _c("div", { staticClass: "modal-content" }, [
+              _vm._m(1),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-body" }, [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.file.name,
+                      expression: "file.name"
+                    }
+                  ],
+                  staticClass: "form-control",
+                  class: { "is-invalid": !_vm.file.name },
+                  attrs: { type: "text", name: "filename", id: "file[name]" },
+                  domProps: { value: _vm.file.name },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(_vm.file, "name", $event.target.value)
+                    }
+                  }
+                })
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-footer" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-secondary",
+                    attrs: { type: "button", "data-dismiss": "modal" }
+                  },
+                  [_vm._v("Close")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-primary",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        return _vm.createFile()
+                      }
+                    }
+                  },
+                  [_vm._v("Create file")]
+                )
+              ])
+            ])
+          ]
+        )
+      ]
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal fade",
+        attrs: {
+          id: "create-directory",
+          tabindex: "-1",
+          role: "dialog",
+          "aria-labelledby": "create-directory-label",
+          "aria-hidden": "true"
+        }
+      },
+      [
+        _c(
+          "div",
+          { staticClass: "modal-dialog", attrs: { role: "document" } },
+          [
+            _c("div", { staticClass: "modal-content" }, [
+              _vm._m(2),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-body" }, [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.directory.name,
+                      expression: "directory.name"
+                    }
+                  ],
+                  staticClass: "form-control",
+                  class: { "is-invalid": !_vm.directory.name },
+                  attrs: {
+                    type: "text",
+                    name: "filename",
+                    id: "directory[name]"
+                  },
+                  domProps: { value: _vm.directory.name },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(_vm.directory, "name", $event.target.value)
+                    }
+                  }
+                })
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-footer" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-secondary",
+                    attrs: { type: "button", "data-dismiss": "modal" }
+                  },
+                  [_vm._v("Close")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-primary",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        return _vm.createDirectory()
+                      }
+                    }
+                  },
+                  [_vm._v("Create directory")]
+                )
+              ])
+            ])
+          ]
+        )
+      ]
+    )
   ])
 }
 var staticRenderFns = [
@@ -37887,6 +38361,56 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Group")])
       ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "h5",
+        { staticClass: "modal-title", attrs: { id: "create-file-label" } },
+        [_vm._v("Create new file")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "h5",
+        { staticClass: "modal-title", attrs: { id: "create-directory-label" } },
+        [_vm._v("Create new directory")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
     ])
   }
 ]

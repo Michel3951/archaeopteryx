@@ -1,7 +1,8 @@
 <template>
     <div class="container-fluid">
         <h1 class="mb-3">File manager for {{ domain.domain }}</h1>
-
+        <button class="btn btn-primary" data-toggle="modal" data-target="#create-file">Create file</button>
+        <button class="btn btn-primary" data-toggle="modal" data-target="#create-directory">Create directory</button>
         <table class="file-table mt-3">
             <thead>
             <tr>
@@ -28,6 +29,46 @@
             </tr>
             </tbody>
         </table>
+
+        <div class="modal fade" id="create-file" tabindex="-1" role="dialog" aria-labelledby="create-file-label" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="create-file-label">Create new file</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" name="filename" id="file[name]" v-model="file.name" :class="{'is-invalid': !file.name}" class="form-control">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" @click="createFile()">Create file</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="create-directory" tabindex="-1" role="dialog" aria-labelledby="create-directory-label" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="create-directory-label">Create new directory</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" name="filename" id="directory[name]" v-model="directory.name" :class="{'is-invalid': !directory.name}" class="form-control">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" @click="createDirectory()">Create directory</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -37,8 +78,35 @@
         props: ['domain', 'files', 'path'],
         data: () => ({
             csrf: null,
+            file: {
+                name: ''
+            },
+            directory: {
+                name: ''
+            }
         }),
         methods: {
+            createFile: function () {
+                fetch(`/domains/${this.domain.domain}/files/create?path=${this.path}&file=${this.file.name}`, {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                        'X-CSRF-TOKEN': this.csrf
+                    },
+                    body: JSON.stringify({
+                        _token: this.csrf,
+                        file: this.file.name,
+                        type: 'file'
+                    })
+                })
+                    .then(res => res.json())
+                    .then(json => {
+                        window.location = json.url
+                    });
+            },
+            createDirectory: function() {
+
+            },
             formatPath: function (child) {
                 let current = this.path;
                 if (!current.endsWith('/')) {
