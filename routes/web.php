@@ -19,8 +19,8 @@ Route::group([
     Route::post('/new', 'HomeController@handle')->name('handle');
     Route::get('/{domain}/files', 'Files\FileManagerController@index')->name('domain.files.index');
     Route::get('/{domain}/files/open', 'Files\FileManagerController@edit')->name('domain.files.edit');
-    Route::post('/{domain}/files/save', 'Files\FileManagerController@update')->name('domain.files.update');
     Route::post('/{domain}/files/create', 'Files\FileManagerController@create')->name('domain.files.create');
+    Route::post('/{domain}/files/save', 'Files\FileManagerController@update')->name('domain.files.update');
 });
 
 Route::group([

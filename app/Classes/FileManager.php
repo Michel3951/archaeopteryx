@@ -32,4 +32,9 @@ class FileManager
         file_put_contents($path . $filename, '');
         return $path . $filename;
     }
+
+    public static function createDirectory($path, $dirname)
+    {
+        mkdir($path . $dirname);
+    }
 }

@@ -27,6 +27,7 @@ class HomeController extends Controller
 
     public function handle(Request $request)
     {
+        dd(1);
         $request->validate([
             'domain' => 'required',
             'type' => 'numeric',

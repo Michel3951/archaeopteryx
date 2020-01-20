@@ -40,7 +40,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <input type="text" name="filename" id="file[name]" v-model="file.name" :class="{'is-invalid': !file.name}" class="form-control">
+                        <input type="text" name="file[name]" id="filename" v-model="file.name" :class="{'is-invalid': !file.name}" class="form-control">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -60,7 +60,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <input type="text" name="filename" id="directory[name]" v-model="directory.name" :class="{'is-invalid': !directory.name}" class="form-control">
+                        <input type="text" name="directory[name]" id="filename" v-model="directory.name" :class="{'is-invalid': !directory.name}" class="form-control">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -87,7 +87,8 @@
         }),
         methods: {
             createFile: function () {
-                fetch(`/domains/${this.domain.domain}/files/create?path=${this.path}&file=${this.file.name}`, {
+                console.log(this.file)
+                fetch(`/domains/${this.domain.domain}/files/create?path=${this.path}&name=${this.file.name}`, {
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/json",
@@ -95,7 +96,7 @@
                     },
                     body: JSON.stringify({
                         _token: this.csrf,
-                        file: this.file.name,
+                        name: this.file.name,
                         type: 'file'
                     })
                 })
@@ -105,7 +106,22 @@
                     });
             },
             createDirectory: function() {
-
+                fetch(`/domains/${this.domain.domain}/files/create?path=${this.path}&name=${this.file.name}`, {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                        'X-CSRF-TOKEN': this.csrf
+                    },
+                    body: JSON.stringify({
+                        _token: this.csrf,
+                        name: this.directory.name,
+                        type: 'directory'
+                    })
+                })
+                    .then(res => res.json())
+                    .then(json => {
+                        // window.location = json.url
+                    });
             },
             formatPath: function (child) {
                 let current = this.path;
@@ -118,7 +134,7 @@
                 return `/domains/${this.domain.domain}/files/open?path=${this.path}&file=${file}`
             },
             up: function () {
-                let path = this.path.replace(/\/[.a-zA-Z-_0-9]+$/, '');
+                let path = this.path.replace(/\/[-_.a-zA-Z0-9]+$/, '');
                 if (!path) return '/';
                 return path;
             },

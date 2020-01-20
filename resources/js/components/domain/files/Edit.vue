@@ -43,7 +43,7 @@
             breadcrumb: function () {
                 let path = this.path;
                 if (path.startsWith('/')) path = path.slice(1);
-                if (path.length > 0) path += '/';
+                if (!path.endsWith('/') && path.length > 1) path += '/';
                 return path + this.file.name;
             },
             reset: function () {

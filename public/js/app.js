@@ -2120,7 +2120,7 @@ __webpack_require__.r(__webpack_exports__);
     breadcrumb: function breadcrumb() {
       var path = this.path;
       if (path.startsWith('/')) path = path.slice(1);
-      if (path.length > 0) path += '/';
+      if (!path.endsWith('/') && path.length > 1) path += '/';
       return path + this.file.name;
     },
     reset: function reset() {
@@ -2273,7 +2273,8 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     createFile: function createFile() {
-      fetch("/domains/".concat(this.domain.domain, "/files/create?path=").concat(this.path, "&file=").concat(this.file.name), {
+      console.log(this.file);
+      fetch("/domains/".concat(this.domain.domain, "/files/create?path=").concat(this.path, "&name=").concat(this.file.name), {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -2281,7 +2282,7 @@ __webpack_require__.r(__webpack_exports__);
         },
         body: JSON.stringify({
           _token: this.csrf,
-          file: this.file.name,
+          name: this.file.name,
           type: 'file'
         })
       }).then(function (res) {
@@ -2290,7 +2291,23 @@ __webpack_require__.r(__webpack_exports__);
         window.location = json.url;
       });
     },
-    createDirectory: function createDirectory() {},
+    createDirectory: function createDirectory() {
+      fetch("/domains/".concat(this.domain.domain, "/files/create?path=").concat(this.path, "&name=").concat(this.file.name), {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          'X-CSRF-TOKEN': this.csrf
+        },
+        body: JSON.stringify({
+          _token: this.csrf,
+          name: this.directory.name,
+          type: 'directory'
+        })
+      }).then(function (res) {
+        return res.json();
+      }).then(function (json) {// window.location = json.url
+      });
+    },
     formatPath: function formatPath(child) {
       var current = this.path;
 
@@ -2304,7 +2321,7 @@ __webpack_require__.r(__webpack_exports__);
       return "/domains/".concat(this.domain.domain, "/files/open?path=").concat(this.path, "&file=").concat(file);
     },
     up: function up() {
-      var path = this.path.replace(/\/[.a-zA-Z-_0-9]+$/, '');
+      var path = this.path.replace(/\/[-_.a-zA-Z0-9]+$/, '');
       if (!path) return '/';
       return path;
     },
@@ -38221,7 +38238,7 @@ var render = function() {
                   ],
                   staticClass: "form-control",
                   class: { "is-invalid": !_vm.file.name },
-                  attrs: { type: "text", name: "filename", id: "file[name]" },
+                  attrs: { type: "text", name: "file[name]", id: "filename" },
                   domProps: { value: _vm.file.name },
                   on: {
                     input: function($event) {
@@ -38298,8 +38315,8 @@ var render = function() {
                   class: { "is-invalid": !_vm.directory.name },
                   attrs: {
                     type: "text",
-                    name: "filename",
-                    id: "directory[name]"
+                    name: "directory[name]",
+                    id: "filename"
                   },
                   domProps: { value: _vm.directory.name },
                   on: {
